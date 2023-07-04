@@ -77,7 +77,6 @@ $(document).ready(function() {
     
               success: function(response) {
                 // Handle success response
-                console.log(response);
                 loadTasks();
                 // Refresh the task list or perform any other desired action
               },
@@ -129,11 +128,11 @@ $(document).ready(function() {
       }
   
       // Validate description field
-      var description = $("#descriptionInput").val();
-      if (description.trim() === "") {
-        $("#descriptionError").text("Description is required");
-        isValid = false;
-      }
+      // var description = $("#descriptionInput").val();
+      // if (description.trim() === "") {
+      //   $("#descriptionError").text("Description is required");
+      //   isValid = false;
+      // }
   
       // Validate priority field
       var priority = $("#prioritySelect").val();
@@ -191,10 +190,8 @@ $(document).ready(function() {
         priority: priority,
         status: status
       };
-      console.log(task)
       // Perform AJAX request to add/edit the task
-      console.log("----------------f")
-      console.log(editTaskId)
+
       if(editTaskId){
         var url = "/get_or_edit_task/" + editTaskId + "/"
       }
@@ -209,7 +206,6 @@ $(document).ready(function() {
                 console.log(response.error)
             }
             else{
-                console.log(response)
                 loadTasks();
                 $("#taskModal").modal("hide");
             }
@@ -224,7 +220,6 @@ $(document).ready(function() {
         return
 
       }
-      console.log(url)
     //   var url = editTaskId ? "/get_or_edit_task/" + editTaskId + "/" : "/add_task";
       $.ajax({
         url: url,
@@ -232,7 +227,6 @@ $(document).ready(function() {
         data: task,
         success: function(response) {
           // Handle success response
-          console.log(response);
           loadTasks();
           // Display success message or perform any additional actions
           $("#taskModal").modal("hide"); // Close the modal after adding/editing the task
@@ -274,11 +268,9 @@ $(document).ready(function() {
           type: "GET",
           success: function(response) {
             // Pre-fill form inputs with task details
-            console.log("&&&&&&&&&&&&&&&&&&&&")
-            console.log(response.status)
+
             $("#titleInput").val(response.title);
             $("#descriptionInput").val(response.description);
-            console.log(response.priority)
             $("#prioritySelect option[value='" + response.priority + "']").prop("selected", true);
             $("#statusSelect option[value='" + response.status +"']").prop('selected', true);
 

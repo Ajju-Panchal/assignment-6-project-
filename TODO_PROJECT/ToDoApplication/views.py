@@ -10,27 +10,21 @@ from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='login')
 def index(request):
-    print("insde-------------------")
-    tasks = Task.objects.filter(user=request.user)
+    # this is the home page view function, to display todolist home page
+    if request.method == 'GET':
+        return render(request, 'ToDoList.html')
+    else:
+        return redirect('/')
 
-
-    # print("FINAL TASK LIST : {}".format(task_data_list))
-    # Get the selected filter options
-    # priority_filter = request.GET.get('priority', '')
-    # status_filter = request.GET.get('status', '')
-    
-    # Apply filters
-    # if priority_filter:
-        # tasks = tasks.filter(priority=priority_filter)
-    # if status_filter:
-        # tasks = tasks.filter(status=status_filter)
-    
-    # Sort tasks by priority (high to low)
-    tasks = tasks.order_by('-task_priority')
-    
-    return render(request, 'ToDoList.html', {'tasks': tasks})
-
+@csrf_exempt
 def login_view(request):
+    """
+    login view function to handle login user login functionality
+    POST: check the username and password, and authenticate the user
+    GET: check if user is alredy login then redirect user to the home page and show the login view page
+
+    params: username and password
+    """
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -53,8 +47,15 @@ def login_view(request):
             return redirect('/')
         # form = AuthenticationForm()
         return render(request, 'userLogin.html')
-
+    
+@csrf_exempt
 def register_view(request):
+    """
+    register view function to handle new user registration functionality
+    POST: check the username, pass and other field, and login the user
+    GET: check if user is alredy login then redirect user to the registration page and show the registration page
+
+    """
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -101,8 +102,12 @@ def register_view(request):
 
 
 def get_task_list(request):
-    print("inside task list")
-    tasks = Task.objects.filter(user = request.user)
+    """
+    API call to get all task details of logged in user
+    return: it returns all task details into json format
+
+    """
+    tasks = Task.objects.filter(user = request.user).order_by('task_priority')
     task_data_list = []
     for task in tasks:
         temp_dict = {
@@ -113,41 +118,20 @@ def get_task_list(request):
             'task_description' : task.task_description
         }
         task_data_list.append(temp_dict)
-    print(task_data_list)
     # return JsonResponse({'tasks': list(tasks.values())})
     return JsonResponse({'tasks': task_data_list})
 
-    
-def edit_data(request, id):
-    obj = get_object_or_404(Task, id=id)
-
-    if request.method == 'POST':
-        field1 = request.POST.get('field1')
-        field2 = request.POST.get('field2')
-        priority = request.POST.get('priority')
-        status = request.POST.get('status')
-
-        obj.field1 = field1
-        obj.field2 = field2
-        obj.priority = priority
-        obj.status = status
-
-        obj.save()
-        return redirect('home')
-
-    return render(request, 'edit.html', {'obj': obj})
-
-def delete_data(request, id):
-    obj = get_object_or_404(Task, id=id)
-
-    if request.method == 'POST':
-        obj.delete()
-        return redirect('home')
-
-    return render(request, 'delete.html', {'obj': obj})
 
 @csrf_exempt
 def add_task(request):
+
+    """
+    API call for add task using POST method:
+    get all task data and create the new task data to the database and also check the validations
+    and return appropriate message into JSON response
+
+    """
+    
     if request.method == 'POST':
         # Retrieve the task details from the request
         title = request.POST.get('title')
@@ -160,8 +144,8 @@ def add_task(request):
         # Check if required fields are not empty
         if not title:
             errors['title'] = 'Title is required'
-        if not description:
-            errors['description'] = 'Description is required'
+        # if not description:
+        #     errors['description'] = 'Description is required'
         if not priority:
             errors['priority'] = 'Priority is required'
 
@@ -180,23 +164,27 @@ def add_task(request):
 
 @csrf_exempt
 def get_or_edit_task(request, task_id):
+
+    """
+    API call for get the particular task or update the particular task using taskID
+    args: TaskID - to get the particular task details
+
+    POST: get the updated task details using taskID and save it into out db and return the success message
+    GET: get the task details using taskID and return it into json response
+    """
+
+
     task = get_object_or_404(Task, id=task_id)
 
     if request.method == 'POST':
-        print("INSIDE EDIT TASK----------")
         # Retrieve the updated task details from the request
         title = request.POST.get('title')
         description = request.POST.get('description')
         priority = request.POST.get('priority')
         status = request.POST.get('status')
 
-        print("----------")
-        print(title)
-        print(description)
-        print(priority)
-
         # Update the task with the new details
-        print(task.id)
+
         task.task_title = title
         task.task_description = description
         task.task_priority = priority
@@ -217,8 +205,13 @@ def get_or_edit_task(request, task_id):
 
 @csrf_exempt
 def delete_task(request, task_id):
+
+    """
+    API call for deleting a particular task
+    args: takes taskID to get the task and delete it and return appropriate message
+    """
+
     # Retrieve the task object
-    print("inside delete task")
     task = get_object_or_404(Task, id=task_id)
 
     if request.method == 'POST':
@@ -231,5 +224,9 @@ def delete_task(request, task_id):
         return JsonResponse({'error': 'Invalid request method.'}, status=400)
     
 def logout_view(request):
+
+    """
+    Function to logout the current user 
+    """
     logout(request)
     return redirect('/')

@@ -3,6 +3,11 @@
 {% load static %}
 {% block content %}
   <br>
+  <style>
+    .error{
+      color: red;
+    }
+  </style>
   <div class="container">
     <br>
     <!-- <h2>To-Do List</h2> -->
@@ -50,7 +55,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="descriptionInput" class="form-label">Description</label>
-                  <textarea class="form-control" id="descriptionInput" required></textarea>
+                  <textarea class="form-control" id="descriptionInput"></textarea>
                   <div id="descriptionError" class="error"></div>
                 </div>
                 <div class="mb-3">
