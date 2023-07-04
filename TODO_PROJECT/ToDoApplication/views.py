@@ -113,8 +113,8 @@ def get_task_list(request):
         temp_dict = {
             'id': task.id,
             'task_title' :  task.task_title,
-            'task_status': dict(Task.STATUS_CHOICES).get(task.task_status),
-            'task_priority': dict(Task.PRIORITY_CHOICES).get(task.task_priority),
+            'task_status': task.get_task_status_display(),
+            'task_priority': task.get_task_priority_display(),
             'task_description' : task.task_description
         }
         task_data_list.append(temp_dict)
@@ -230,3 +230,69 @@ def logout_view(request):
     """
     logout(request)
     return redirect('/')
+
+def filter_by_priority(request):
+    """
+    Fetches tasks based on the selected priority via AJAX call.
+
+    Parameters:
+    - request: The HTTP request object.
+
+    Returns:
+    - A JsonResponse containing the task data if the priority is valid,
+      otherwise an error message.
+    """
+    priority = request.GET.get('priority')
+
+    if priority:
+        if priority == "0":
+            tasks = Task.objects.filter(user = request.user).order_by("task_priority")
+        else:
+            tasks = Task.objects.filter(user = request.user, task_priority=priority)
+
+        task_data = []
+        for task in tasks:
+            task_data.append({
+                'task_title': task.task_title,
+                'task_description': task.task_description,
+                'task_status': task.get_task_status_display(),
+                'user': task.user.username,
+                'task_priority': task.get_task_priority_display(),
+            })
+        return JsonResponse({'tasks': task_data})
+    
+    return JsonResponse({'error': 'Invalid priority value'})
+
+def filter_by_status(request):
+    """
+    Fetches tasks based on the selected status via AJAX call.
+
+    Parameters:
+    - request: The HTTP request object.
+
+    Returns:
+    - A JsonResponse containing the task data if the status is valid,
+      otherwise an error message.
+    """
+    status = request.GET.get('status')
+
+    if status:
+        if status == "0":
+            tasks = Task.objects.filter(user = request.user).order_by("task_priority")
+        else:
+            tasks = Task.objects.filter(user = request.user, task_status=status).order_by("task_priority")
+
+        task_data = []
+        for task in tasks:
+            task_data.append({
+                'task_title': task.task_title,
+                'task_description': task.task_description,
+                'task_status': task.get_task_status_display(),
+                # 'task_status': dict(Task.STATUS_CHOICES).get(task.task_status),
+                # 'task_priority': dict(Task.PRIORITY_CHOICES).get(task.task_priority),
+                'user': task.user.username,
+                'task_priority': task.get_task_priority_display(),
+            })
+        return JsonResponse({'tasks': task_data})
+    
+    return JsonResponse({'error': 'Invalid priority value'})

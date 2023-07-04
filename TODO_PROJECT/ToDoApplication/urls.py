@@ -11,6 +11,7 @@ urlpatterns = [
     # path('get_task/<int:task_id>/', views.get_task, name='get_task'),
     path('get_or_edit_task/<int:task_id>/', views.get_or_edit_task, name='get_or_edit_task'),
     path('logout/', views.logout_view, name='logout'),
-
+    path('filter_task_priority/', views.filter_by_priority, name="filter_by_priority"),
+    path('filter_task_status/', views.filter_by_status, name="filter_by_status")
 
 ]

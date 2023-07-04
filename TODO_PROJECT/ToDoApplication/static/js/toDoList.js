@@ -1,5 +1,6 @@
 $(document).ready(function() {
 
+
   // Function to load tasks via AJAX
   function loadTasks() {
     $.ajax({
@@ -7,39 +8,7 @@ $(document).ready(function() {
       type: "GET",
       success: function(response) {
         var tasks = response.tasks;
-
-        // Clear existing task list
-        $("#task-list").empty();
-
-        if (tasks.length > 0) {
-          // Iterate over tasks and append them to the task list
-          $.each(tasks, function(index, task) {
-            var taskItem = `
-              <li id="task-${task.id}" class="list-group-item">
-                <div class="row">
-                  <div class="col-md-6">
-                    <h4>${task.task_title}</h4>
-                    <p>${task.task_description}</p>
-                    <p>Priority: ${task.task_priority}</p>
-                    <p>Status: ${task.task_status}</p>
-                  </div>
-                  <div class="col-md-6 text-right">
-                    <button type="button" class="btn btn-primary editTaskBtn" data-task-id="${task.id}">
-                      Edit Task
-                    </button>
-                    <button class="btn btn-danger delete-task-btn" data-task-id="${task.id}">Delete</button>
-                  </div>
-                </div>
-              </li>
-              <br>
-            `;
-
-            $("#task-list").append(taskItem);
-          });
-        } else {
-          // Display message for no tasks found
-          $("#task-list").append("<li class='list-group-item'>No tasks found.</li>");
-        }
+        createTaskUI(tasks)
 
         $(".delete-task-btn").on("click", function() {
             
@@ -94,6 +63,10 @@ $(document).ready(function() {
         // Display error message or perform any error handling
       }
     });
+
+
+
+
   }
 
   // Call loadTasks initially to load tasks on page load
@@ -300,4 +273,86 @@ $(document).ready(function() {
 
         
   });
+  
+  function createTaskUI(tasks){
+    // Clear existing task list
+    $("#task-list").empty();
+
+    if (tasks.length > 0) {
+      // Iterate over tasks and append them to the task list
+      $.each(tasks, function(index, task) {
+        var taskItem = `
+          <li id="task-${task.id}" class="list-group-item">
+            <div class="row">
+              <div class="col-md-6">
+                <h4>${task.task_title}</h4>
+                <p>${task.task_description}</p>
+                <p>Priority: ${task.task_priority}</p>
+                <p>Status: ${task.task_status}</p>
+              </div>
+              <div class="col-md-6 text-right">
+                <button type="button" class="btn btn-primary editTaskBtn" data-task-id="${task.id}">
+                  Edit Task
+                </button>
+                <button class="btn btn-danger delete-task-btn" data-task-id="${task.id}">Delete</button>
+              </div>
+            </div>
+          </li>
+          <br>
+        `;
+
+        $("#task-list").append(taskItem);
+      });
+    } else {
+      // Display message for no tasks found
+      $("#task-list").append("<li class='list-group-item'>No tasks found.</li>");
+    }
+
+}
+        //Priority filter ajax call
+        $('#priority-filter').change(function() {
+          $("#status-filter").val('0')
+          var priority = $(this).val();
+      
+          $.ajax({
+            url: '/filter_task_priority/',
+            method: 'GET',
+            data: { priority: priority },
+            success: function(response) {
+              // Handle the response data here
+              var tasks = response.tasks
+              createTaskUI(tasks)
+              console.log(response);
+              // You can update your UI or perform other operations with the received data
+            },
+            error: function(xhr, errmsg, err) {
+              // Handle error case
+              console.log(errmsg);
+            }
+          });
+        });
+    
+        //Status filter ajax call
+        $('#status-filter').change(function() {
+          $("#priority-filter").val('0')
+
+          var status = $(this).val();
+      
+          $.ajax({
+            url: '/filter_task_status/',
+            method: 'GET',
+            data: { status: status },
+            success: function(response) {
+              // Handle the response data here
+              var tasks = response.tasks
+              createTaskUI(tasks)
+              console.log(response);
+              // You can update your UI or perform other operations with the received data
+            },
+            error: function(xhr, errmsg, err) {
+              // Handle error case
+              console.log(errmsg);
+            }
+          });
+        });
   
