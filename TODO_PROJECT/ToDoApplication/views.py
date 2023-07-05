@@ -253,6 +253,7 @@ def filter_by_priority(request):
         task_data = []
         for task in tasks:
             task_data.append({
+                'id': task.id,
                 'task_title': task.task_title,
                 'task_description': task.task_description,
                 'task_status': task.get_task_status_display(),
@@ -285,6 +286,7 @@ def filter_by_status(request):
         task_data = []
         for task in tasks:
             task_data.append({
+                'id': task.id,
                 'task_title': task.task_title,
                 'task_description': task.task_description,
                 'task_status': task.get_task_status_display(),

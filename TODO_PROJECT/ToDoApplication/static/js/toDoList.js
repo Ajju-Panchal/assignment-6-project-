@@ -11,7 +11,7 @@ $(document).ready(function() {
         createTaskUI(tasks)
 
         $(".delete-task-btn").on("click", function() {
-            
+
             // Get the task ID from the data attribute
             var taskId = $(this).data("task-id");
         
@@ -23,7 +23,9 @@ $(document).ready(function() {
           });
         
           // Event handler for confirm delete button in modal
-          $("#confirmDeleteBtn").on("click", function() {
+          $("#confirmDeleteBtn").unbind().on("click", function() {
+            $("#status-filter").val('0')
+            $("#priority-filter").val('0')
             // Get the task ID from the delete button's data attribute
             var taskId = $(this).data("task-id");
         
@@ -164,7 +166,8 @@ $(document).ready(function() {
         status: status
       };
       // Perform AJAX request to add/edit the task
-
+      $("#status-filter").val('0')
+      $("#priority-filter").val('0')
       if(editTaskId){
         var url = "/get_or_edit_task/" + editTaskId + "/"
       }
@@ -298,7 +301,7 @@ $(document).ready(function() {
               </div>
             </div>
           </li>
-          <br>
+          <br> 
         `;
 
         $("#task-list").append(taskItem);
@@ -312,6 +315,7 @@ $(document).ready(function() {
         //Priority filter ajax call
         $('#priority-filter').change(function() {
           $("#status-filter").val('0')
+
           var priority = $(this).val();
       
           $.ajax({
@@ -324,18 +328,34 @@ $(document).ready(function() {
               createTaskUI(tasks)
               console.log(response);
               // You can update your UI or perform other operations with the received data
+
+
+              $(".delete-task-btn").unbind().on("click", function() {
+                // Get the task ID from the data attribute
+                var taskId = $(this).data("task-id");
+            
+                // Update the modal's delete button data attribute with the task ID
+                $("#confirmDeleteBtn").data("task-id", taskId);
+            
+                // Show the modal
+                $("#deleteTaskModal").modal("show");
+              });
+            
+
+        
             },
             error: function(xhr, errmsg, err) {
               // Handle error case
               console.log(errmsg);
             }
+                      
           });
+
         });
     
         //Status filter ajax call
         $('#status-filter').change(function() {
           $("#priority-filter").val('0')
-
           var status = $(this).val();
       
           $.ajax({
@@ -348,6 +368,20 @@ $(document).ready(function() {
               createTaskUI(tasks)
               console.log(response);
               // You can update your UI or perform other operations with the received data
+              
+            $(".delete-task-btn").unbind().on("click", function() {
+            
+            // Get the task ID from the data attribute
+            var taskId = $(this).data("task-id");
+        
+            // Update the modal's delete button data attribute with the task ID
+            $("#confirmDeleteBtn").data("task-id", taskId);
+        
+            // Show the modal
+            $("#deleteTaskModal").modal("show");
+          });
+        
+    
             },
             error: function(xhr, errmsg, err) {
               // Handle error case
